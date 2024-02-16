@@ -1,0 +1,14 @@
+langchain
+transformers
+torch
+sentencepiece
+accelerate
+sentence_transformers
+chromadb
+pypdf
+tiktoken
+streamlit
+fastapi
+uvicorn
+python-multipart
+aiofiles
