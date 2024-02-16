@@ -101,13 +101,12 @@
     "<extra_id_98>",
     "<extra_id_99>"
   ],
-  "clean_up_tokenization_spaces": true,
   "eos_token": "</s>",
   "extra_ids": 100,
   "model_max_length": 512,
   "pad_token": "<pad>",
   "sp_model_kwargs": {},
-  "special_tokens_map_file": "/home/younes_huggingface_co/.cache/huggingface/hub/models--google--t5-v1_1-large/snapshots/314bc112b191ec17b625ba81438dc73d6c23659d/special_tokens_map.json",
+  "special_tokens_map_file": "/home/younes_huggingface_co/.cache/huggingface/hub/models--google--t5-v1_1-base/snapshots/650d7745bf1e502d6949b22cc19155cd656d3d4e/special_tokens_map.json",
   "tokenizer_class": "T5Tokenizer",
   "unk_token": "<unk>"
 }
