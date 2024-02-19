@@ -1,45 +1,58 @@
+import gradio as gr
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.document_loaders import DirectoryLoader, PyPDFLoader
-from langchain.chains.summarize import load_summarize_chain
-from transformers import T5Tokenizer, T5ForConditionalGeneration
-import torch
-from transformers import pipeline
-import streamlit as st
-import base64
-
-# use cpu
-
-# Load the summarization chain
-checkpoint = 'model'
-tokenizer = T5Tokenizer.from_pretrained(checkpoint)
-base_model = T5ForConditionalGeneration.from_pretrained(checkpoint, \
-                                                       device_map = 'cpu', \
-                                                       torch_dtype = torch.float32)
+from langchain_community.llms import HuggingFaceHub
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import Chroma
+from langchain.chains import RetrievalQA
+from langchain_community.document_loaders import PyMuPDFLoader
+from dotenv import load_dotenv
+load_dotenv()
 
 
-def pdf_preprocessing(file):
-    pdf_loader = PyPDFLoader(file)
-    pages = pdf_loader.load_and_split()
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=200, chunk_overlap=50)
-    texts = text_splitter.split_documents(pages)
-    final = ""
-    for text in texts:
-        print(text)
-        final += text.page_content
-    return final
+import os
 
-def llm_pipeline(filepath):
-    pipe_sum = pipeline(
-        'summarization',
-        model=base_model,
-        tokenizer=tokenizer,
-        max_length=300,
-        min_length=30,
-    )
+os.environ["HUGGINGFACEHUB_API_TOKEN"] = "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"
 
-    input_text = pdf_preprocessing(filepath)
-    summary = pipe_sum(input_text)
-    result = summary[0]['summary_text']
-    return result
+def load_doc(pdf_doc):
 
-print(llm_pipeline('python_tutorial.pdf'))
+    loader = PyMuPDFLoader(pdf_doc.name)
+    documents = loader.load()
+    embedding = HuggingFaceEmbeddings()
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+    text = text_splitter.split_documents(documents)
+    db = Chroma.from_documents(text, embedding)
+    llm = HuggingFaceHub(repo_id="OpenAssistant/oasst-sft-1-pythia-12b", model_kwargs={"temperature": 1.0, "max_length": 256})
+    global chain
+    chain = RetrievalQA.from_chain_type(llm=llm,chain_type="stuff",retriever=db.as_retriever())
+    return 'Document has successfully been loaded'
+
+def answer_query(query):
+    question = query
+    return chain.run(question)
+html = """
+<div style="text-align:center; max width: 700px;">
+    <h1>ChatPDF</h1>
+    <p> Upload a PDF File, then click on Load PDF File <br>
+    Once the document has been loaded you can begin chatting with the PDF =)
+</div>"""
+css = """container{max-width:700px; margin-left:auto; margin-right:auto,padding:20px}"""
+with gr.Blocks(css=css,theme=gr.themes.Monochrome()) as demo:
+    gr.HTML(html)
+    with gr.Column():
+        gr.Markdown('ChatPDF')
+        pdf_doc = gr.File(label="Load a pdf",file_types=['.pdf','.docx'],type='filepath')
+        with gr.Row():
+            load_pdf = gr.Button('Load pdf file')
+            status = gr.Textbox(label="Status",placeholder='',interactive=False)
+
+
+        with gr.Row():
+            input = gr.Textbox(label="type in your question")
+            output = gr.Textbox(label="output")
+        submit_query = gr.Button("submit")
+
+        load_pdf.click(load_doc,inputs=pdf_doc,outputs=status)
+
+        submit_query.click(answer_query,input,output)
+
+demo.launch()
