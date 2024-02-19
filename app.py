@@ -3,9 +3,10 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.llms import HuggingFaceHub
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
-from langchain.chains import RetrievalQA
 from langchain_community.document_loaders import PyMuPDFLoader
 from dotenv import load_dotenv
+from langchain.chains import RetrievalQA
+from langchain.chains import ConversationalRetrievalChain
 load_dotenv()
 
 
@@ -23,15 +24,18 @@ def load_doc(pdf_doc):
     db = Chroma.from_documents(text, embedding)
     llm = HuggingFaceHub(repo_id="OpenAssistant/oasst-sft-1-pythia-12b", model_kwargs={"temperature": 1.0, "max_length": 256})
     global chain
+    #chain = ConversationalRetrievalChain.from_llm(llm=llm, retriever=db.as_retriever())
     chain = RetrievalQA.from_chain_type(llm=llm,chain_type="stuff",retriever=db.as_retriever())
     return 'Document has successfully been loaded'
 
 def answer_query(query):
     question = query
-    return chain.run(question)
+    res = chain.run(question)
+    res.split("Question:")[1].split("Helpful Answer:")[1].strip()
+    return res
 html = """
 <div style="text-align:center; max width: 700px;">
-    <h1>ChatPDF</h1>
+    <h1>Chat With Your PDF</h1>
     <p> Upload a PDF File, then click on Load PDF File <br>
     Once the document has been loaded you can begin chatting with the PDF =)
 </div>"""
