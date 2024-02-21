@@ -1,3 +1,5 @@
 envv
 model/pytorch_model.bin
 .env
+testing/*.wav
+bloom/*.bin

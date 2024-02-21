@@ -5,3 +5,4 @@ unstructured
 unstructured[local-inference]
 PyMuPDF
 gradio
+TTS
