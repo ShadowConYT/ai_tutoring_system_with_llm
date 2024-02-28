@@ -1,0 +1,10 @@
+langchain
+einops
+accelerate
+transformers
+xformers
+bitsandbytes
+scipy
+sentencepiece
+sentence_transformers
+python_dotenv
