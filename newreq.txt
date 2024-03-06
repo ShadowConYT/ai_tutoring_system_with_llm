@@ -1,10 +1,12 @@
 langchain
 einops
 accelerate
-transformers
+ctransformers[cuda]
 xformers
 bitsandbytes
 scipy
 sentencepiece
 sentence_transformers
 python_dotenv
+llama-index-llms-huggingface
+llama-index

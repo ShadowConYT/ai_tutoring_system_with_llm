@@ -10,7 +10,7 @@ from langchain.chains import RetrievalQA
 from langchain.chains import ConversationalRetrievalChain
 load_dotenv()
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from ctransformers import AutoModelForCausalLM
 import pyttsx3 as tts
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -26,14 +26,24 @@ def load_doc(pdf_doc):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     text = text_splitter.split_documents(documents)
     db = Chroma.from_documents(text, embedding)
-    llm = HuggingFaceHub(repo_id="OpenAssistant/oasst-sft-1-pythia-12b", model_kwargs={"temperature": 1.0, "max_length": 1250})
+    #llm = HuggingFaceHub(repo_id="OpenAssistant/oasst-sft-1-pythia-12b", model_kwargs={"temperature": 1.0, "max_length": 1250})
     # load my local model from directory
     #tokenizer = AutoTokenizer.from_pretrained("bloom")
-    #model = AutoModelForCausalLM.from_pretrained("bloom")
+    config = {
+    'max_new_tokens': 256,
+    'repetition_penalty': 1.1,
+    'temperature': 0.7,
+    'stream': True
+    }
+    model = AutoModelForCausalLM.from_pretrained("bloke/",
+                                                model_file='llama-2-7b-chat.ggmlv3.q4_K_M.bin', 
+                                                model_type="llama",
+                                                **config)
+
 
     global chain
     #chain = ConversationalRetrievalChain.from_llm(llm=llm, retriever=db.as_retriever())
-    chain = RetrievalQA.from_chain_type(llm=llm,chain_type="stuff",retriever=db.as_retriever())
+    chain = RetrievalQA.from_chain_type(llm=model,chain_type="stuff",retriever=db.as_retriever())
     return 'Document has successfully been loaded'
 
 def text_to_speech(text):
