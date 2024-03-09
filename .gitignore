@@ -1,11 +1,5 @@
-envv
-modell/pytorch_model.bin
 .env
-testing/*.wav
-bloom/*.bin
-testing/model
-bitsandbytes-0.41.1.whl
-bitsandbytes
-bloke
-bitsandbytes-0.39.0-py3-none-any.whl
-testing/__pycache__
+meta/*.safetensors
+meta/*.bin
+/bloke
+/guanco
