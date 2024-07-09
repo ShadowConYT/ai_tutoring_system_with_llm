@@ -1,4 +1,5 @@
 .env
+*.pyc
 meta/*.safetensors
 meta/*.bin
 /bloke

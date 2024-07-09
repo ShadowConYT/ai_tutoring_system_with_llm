@@ -9,7 +9,7 @@ def read_root():
     return "Server is Up and Running..."
 
 @app.get("/query/")
-def read_item(q: str):
+async def read_item(q: str):
     return main(q)
 
 if __name__ == "__main__":
