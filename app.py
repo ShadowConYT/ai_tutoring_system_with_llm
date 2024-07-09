@@ -1,18 +1,17 @@
-import streamlit as st
-from time import sleep
+from typing import Union
+from fastapi import FastAPI
+from model import main
 
-st.title('ShadowCon\'s RAG Using Llama2 and Streamlit')
+app = FastAPI()
 
-st.write("Choose a PDF File")
-uploaded_file = st.file_uploader("PDF File",
-                 type='pdf',
-                 accept_multiple_files=False,
-                 on_change=None,)
+@app.get("/")
+def read_root():
+    return "Server is Up and Running..."
 
-if uploaded_file is not None:
-    st.write("File Uploaded")
-    sleep(5)
-    st.write("Processing the file")
+@app.get("/query/")
+def read_item(q: str):
+    return main(q)
 
-    # Processing the file
-    st.write(f"File Processed: {uploaded_file.name}")
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app)

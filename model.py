@@ -76,9 +76,9 @@ def get_index():
     index=VectorStoreIndex.from_documents(documents,service_context=embed_model())
     return index
 
-def main():
+def main(user_input: str):
     query_engine=get_index().as_query_engine()
-    response=query_engine.query("what is this PDF tells about?")
+    response=query_engine.query(user_input)
     out = response
     print(response)
 
