@@ -18,7 +18,7 @@ pip install -r requirements.txt
 ***
 ### Prerequisites
 - Anaconda or MiniConda
-- Python 3.8 or above
+- Python 3.10 or above
 - HuggingFace API Key
 - Access to Meta llama 2
 - Elevenlabs API Key
